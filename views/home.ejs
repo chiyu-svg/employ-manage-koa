@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        img {
+            height: 300px;
+            width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <h1>home page</h1>
+    <label>用户名：</label><input type="text" name="username" id="username"/><br/>
+    <label>密  码：</label><input type="password" name="password" id="password"/><br/>
+    <input type="file" name="avator" id="avator"/>
+    <button id="submit">提交</button><br/>
+    <img id="img"/>
+    <script>
+        const username = document.querySelector("#username");
+        const password = document.querySelector("#password");
+        const submit = document.querySelector("#submit");
+        const avator = document.querySelector("#avator");
+        const img = document.querySelector("#img");
+        submit.onclick = function() {
+            const formsdata = new FormData();
+            formsdata.append("username", username.value);
+            formsdata.append("password", password.value);
+            formsdata.append("avator", avator.files[0]);
+            
+            axios.post("/employ", formsdata, {
+                headers: {
+                    'Content-Type': "multipart/form-data"
+                }
+            }).then(result => {
+               img.src = result.data;
+            })
+        }
+    </script>
+</body>
+</html>
