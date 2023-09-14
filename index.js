@@ -9,6 +9,7 @@ const bodyParser = require("koa-bodyparser");
 const views = require("koa-views");
 const session = require("koa-session-minimal");
 require("./config/db.config"); // 创建数据连接
+require("./ws/webSocketServer"); 
 
 const router = new Router();
 const app = new koa();
@@ -54,6 +55,7 @@ app.use(session({
 router.use("/login", loginRouter.routes(), loginRouter.allowedMethods());
 router.use("/home", homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/employ", employRouter.routes(), employRouter.allowedMethods());
+// router.user("/webchat", )
 
 // 重定向路由路径
 router.redirect("/", "/login.html");

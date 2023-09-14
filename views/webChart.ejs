@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Welcome Web Chat</h1>
+    <label>状态：</label><span id="state"></span><br/>
+    <p id="show_message"></p>
+    <input type="text" id="message"/>
+    <select id="userlist"></select>
+    <button id="send">发送</button>
+    <script>
+        const selector = document.querySelector("#userlist");
+        const input = document.querySelector("#message");
+        const show_message = document.querySelector("#show_message");
+        const token = localStorage.getItem("token");
+        const ws = new WebSocket(`ws://localhost:8080?token=${token}`);
+        const MessageType = {
+            GroupList: 0,
+            GroupChat: 1,
+            PrivateChat: 2
+        }
+        ws.onopen = () => {
+            const state = document.querySelector("#state");
+            state.innerHTML = "登录";
+        }
+        ws.onmessage = (msgobj) => {
+            const data = JSON.parse(msgobj.data);
+            const { messageType } = data;
+            if(messageType === MessageType.GroupList) {
+                renderAllUser(data.message);
+            }
+            if(messageType === MessageType.PrivateChat) {
+                renderPrivateMessage(data.message);
+            }
+            
+        }
+        function renderAllUser(data) {
+            let subElement = "";
+            data.forEach(item => {
+                subElement += `<option value="${item}">${item}</option>`;
+            });
+            selector.innerHTML = subElement;
+        }
+        const btn_send = document.querySelector("#send");
+        btn_send.onclick = function () {
+            const message = input.value;
+            ws.send(genMessage(MessageType.PrivateChat, selector.value, message));
+        }
+        function genMessage(messageType, user, message) {
+            return JSON.stringify({
+                messageType,
+                user,
+                message
+            })
+        }
+        function renderPrivateMessage(message) {
+            show_message.innerHTML = message;
+        }
+    </script>
+</body>
+</html>
